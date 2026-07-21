@@ -1,0 +1,22 @@
+<!-- snippets.html — a snippet LIBRARY: many fragments in one file.
+     Load it once (the @-loader caches by URL), stamp copies with the
+     $ context argument:
+
+       const snippets = $$("@/snippets.html");
+       $("#user-card", snippets).removeAttr("id").appendTo("#list");
+
+     Selections from an HTML context are CLONES — stamp as many as you like. -->
+
+<section id="user-card" class="snip-card" style="border:1px solid #1f2b28;border-radius:10px;padding:.7rem;background:#0d1614">
+  <b style="color:#34d399">$${"snip.user" | "Somebody"}</b>
+  <div style="color:#8aa39c;font-size:.85rem">stamped from snippets.html — reactive via $${} on insert</div>
+</section>
+
+<section id="alert-card" class="snip-card" style="border:1px solid #f59e0b;border-radius:10px;padding:.7rem;background:#1a1410">
+  <b style="color:#f59e0b">⚠ heads up</b>
+  <div style="color:#8aa39c;font-size:.85rem">an alert snippet, same library, same one-line stamp</div>
+</section>
+
+<li id="chip-snippet" style="border:1px solid #1f2b28;border-radius:8px;padding:.25rem .6rem;list-style:none;display:inline-block">
+  chip from the library
+</li>

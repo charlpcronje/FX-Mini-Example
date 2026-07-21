@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!-- plus.html — FX Mini Plus playground (open via fxm serve → /plus.html) -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FX Mini Plus — Playground</title>
+  <style>
+    :root {
+      --bg: #0b0f0e; --panel: #121a18; --panel-2: #0e1614; --line: #1f2b28;
+      --ink: #dfe7e4; --muted: #8aa39c; --accent: #2dd4bf; --accent-2: #34d399;
+      --warn: #f59e0b; --bad: #f87171;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, #10201c 0%, var(--bg) 55%);
+      color: var(--ink); line-height: 1.5; padding: 2rem 1.25rem 6rem;
+    }
+    .wrap { max-width: 940px; margin: 0 auto; }
+    header { margin-bottom: 2rem; }
+    .logo {
+      font-size: 2.6rem; font-weight: 900; letter-spacing: -0.04em;
+      background: linear-gradient(120deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .tag { color: var(--muted); font-size: 0.95rem; }
+    code { font-family: var(--mono); color: var(--accent); font-size: 0.9em; }
+    section {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.35rem; margin-top: 1.1rem;
+    }
+    h2 { font-size: 1.05rem; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.5rem; }
+    h2 .n { font-family: var(--mono); font-size: 0.72rem; color: var(--bg); background: var(--accent); border-radius: 6px; padding: 0.1rem 0.45rem; font-weight: 700; }
+    .hint { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.9rem; }
+    pre.snip {
+      background: #08110f; border: 1px solid var(--line); border-radius: 9px;
+      padding: 0.6rem 0.8rem; margin: 0 0 0.8rem; overflow-x: auto;
+      font-family: var(--mono); font-size: 0.8rem; color: #b7ccc6; line-height: 1.5;
+    }
+    pre.snip .c { color: #5b736c; } pre.snip .s { color: var(--accent-2); }
+    .row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    button {
+      font: inherit; font-weight: 600; cursor: pointer; background: #16211e; color: var(--ink);
+      border: 1px solid var(--line); border-radius: 9px; padding: 0.5rem 0.9rem; transition: border-color .15s, transform .05s;
+    }
+    button:hover { border-color: var(--accent); }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    input[type=text], select { font: inherit; background: #0c1412; color: var(--ink); border: 1px solid var(--line); border-radius: 9px; padding: 0.5rem 0.7rem; min-width: 160px; }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    .out { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-2); min-height: 1.2em; }
+    .pill { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+    #todoList { list-style: none; margin-top: .8rem; display: flex; flex-direction: column; gap: .4rem; }
+    #todoList li.todo { display: flex; align-items: center; gap: .6rem; background: #0d1614; border: 1px solid var(--line); border-radius: 9px; padding: .45rem .7rem; }
+    #todoList li.todo.done span { text-decoration: line-through; color: var(--muted); }
+    #todoList li.muted { color: var(--muted); font-size: .85rem; padding: .4rem 0; }
+    #todoList .del { margin-left: auto; padding: .1rem .55rem; color: var(--bad); border-radius: 7px; }
+    .fxstage { height: 90px; display: flex; align-items: center; gap: 1rem; margin-top: .6rem; }
+    #fxbox { width: 120px; height: 56px; border-radius: 10px; background: linear-gradient(120deg, var(--accent), #a78bfa); }
+    #team { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .5rem; margin-top: .6rem; }
+    #team li { background: #0d1614; border: 1px solid var(--line); border-radius: 9px; padding: .5rem .7rem; font-size: .9rem; }
+    #team li b { color: var(--accent-2); }
+    .invalid { border-color: var(--bad) !important; }
+    #parityList { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+    #parityList li { background: #0d1614; border: 1px solid var(--line); border-radius: 8px; padding: .25rem .6rem; font-family: var(--mono); font-size: .8rem; }
+    #parityList li.hot { border-color: var(--warn); color: var(--warn); }
+    #log { position: fixed; right: 0; bottom: 0; left: 0; max-height: 28vh; overflow: auto; background: #06100e; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 0.78rem; color: #9fb7b0; padding: 0.6rem 1rem; }
+    #log .ok { color: var(--accent-2); } #log .err { color: var(--bad); } #log .k { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">FX&nbsp;Mini&nbsp;Plus</div>
+      <p class="tag">Everything FX Mini does, plus the whole everyday jQuery API, WAAPI effects, sync <code>$.ajax</code>, computed nodes, keyed list rendering, persistence and undo/redo — all still <strong>synchronous</strong>. Open <code>app-plus.js</code> for every call below.</p>
+    </header>
+
+    <!-- 1. Reactive todo -->
+    <section>
+      <h2><span class="n">1</span> Reactive todo — <code>bindEach</code> + <code>$list</code> + <code>$computed</code> + <code>$persist</code> + <code>$history</code></h2>
+      <p class="hint">Keyed diffing (unchanged rows keep their DOM), one-line persistence (reload the page!), and time travel. Stats are a <em>computed node</em> bound with plain <code>.text()</code>.</p>
+      <pre class="snip">$(<span class="s">"#todoList"</span>).bindEach(<span class="s">"todo.items"</span>, { render, key: t =&gt; t.id, empty });
+$list(<span class="s">"todo.items"</span>).push({ id, text, done: false });   <span class="c">// every watcher fires</span>
+$computed(<span class="s">"todo.stats"</span>, [<span class="s">"todo.items"</span>], items =&gt; `${items.filter(t =&gt; !t.done).length} open`);
+$persist(<span class="s">"todo.items"</span>);  $history.track(<span class="s">"todo.items"</span>);</pre>
+      <div class="row">
+        <input id="todoText" type="text" placeholder="what needs doing?" />
+        <button id="todoAdd">add</button>
+        <button id="undoBtn">⟲ undo</button>
+        <button id="redoBtn">⟳ redo</button>
+        <button id="clearDone">clear done</button>
+        <span class="out" id="todoStats"></span>
+      </div>
+      <ul id="todoList"></ul>
+    </section>
+
+    <!-- 2. Effects -->
+    <section>
+      <h2><span class="n">2</span> Effects — jQuery API on the Web Animations engine</h2>
+      <p class="hint">Queued per element, chainable, synchronous calls. <code>.stop()</code> freezes mid-flight; reduced-motion users get instant states.</p>
+      <pre class="snip">$(<span class="s">"#fxbox"</span>).fadeOut(400).fadeIn(400).slideUp(300).slideDown(300);   <span class="c">// queue!</span>
+$(<span class="s">"#fxbox"</span>).animate({ width: <span class="s">"+=80"</span>, opacity: 0.4 }, 500, () =&gt; …);</pre>
+      <div class="row">
+        <button id="fxFade">fade out/in</button>
+        <button id="fxSlide">slide up/down</button>
+        <button id="fxPulse">animate +=80</button>
+        <button id="fxChain">big queued chain</button>
+        <button id="fxStop">stop()</button>
+        <button id="fxTop">animate scrollTop → 0</button>
+      </div>
+      <div class="fxstage"><div id="fxbox"></div><span class="pill" id="fxInfo"></span></div>
+    </section>
+
+    <!-- 3. Sync ajax -->
+    <section>
+      <h2><span class="n">3</span> Node-first HTTP — <code>$$("node@url").get()</code></h2>
+      <p class="hint">FX grammar: select the binding, act on it. The parsed body is the return value AND grafts onto the node — every binding updates (the list below renders via <code>bindEach</code>). Inside handlers it rides the kernel's <code>FXSuspend</code>/replay, so the UI thread is <strong>never blocked</strong> and requests fire exactly once. <code>$.ajax</code>/<code>$.get</code> remain as jQuery-compat shims.</p>
+      <pre class="snip">const data = $$(<span class="s">"api.team@/data.json"</span>).get();     <span class="c">// suspends, fills node, returns body</span>
+$$(<span class="s">"app.saved@/api/save"</span>).post({ name: <span class="s">"Ada"</span> });  <span class="c">// the argument IS the payload</span>
+$.ajaxSetup({ schema: { template: <span class="s">"envelope"</span> } }); <span class="c">// response template, app-wide</span>
+$(<span class="s">"#pageHost"</span>).load(<span class="s">"/page.html section"</span>);        <span class="c">// classic .load, selector filter</span></pre>
+      <div class="row">
+        <button id="ajaxGet">$$("api.team@/data.json").get()</button>
+        <button id="ajaxLoad">$("#pageHost").load("/page.html section")</button>
+        <button id="ajax404">$.http 404 → envelope</button>
+        <span class="out" id="ajaxOut"></span>
+      </div>
+      <ul id="team"></ul>
+      <div id="pageHost" style="margin-top:.6rem"></div>
+    </section>
+
+    <!-- 4. Forms -->
+    <section>
+      <h2><span class="n">4</span> Forms — <code>bindForm</code>, <code>serialize</code>, <code>enableWhen</code></h2>
+      <p class="hint">One call binds every named control two-way to <code>$$("demo.form.*")</code>. The JSON view is a computed node; the button enables itself reactively.</p>
+      <pre class="snip">$(<span class="s">"#demoForm"</span>).bindForm(<span class="s">"demo.form"</span>);
+$(<span class="s">"#submitBtn"</span>).enableWhen(<span class="s">"demo.form.name"</span>, v =&gt; v &amp;&amp; v.length &gt; 2);</pre>
+      <form id="demoForm" class="row" onsubmit="return false">
+        <input name="name" type="text" placeholder="name (3+ chars)" />
+        <select name="plan"><option value="free">free</option><option value="pro">pro</option></select>
+        <label class="pill"><input name="notify" type="checkbox" /> notify</label>
+        <button id="submitBtn" type="button">serialize()</button>
+      </form>
+      <div class="row" style="margin-top:.5rem">
+        <span class="pill">live node view →</span><span class="out" id="formOut"></span>
+      </div>
+      <div class="row"><span class="pill">serialized →</span><span class="out" id="serOut"></span></div>
+    </section>
+
+    <!-- 5. jQuery parity -->
+    <section>
+      <h2><span class="n">5</span> jQuery parity — creation, traversal, events with namespaces</h2>
+      <p class="hint"><code>$("&lt;li&gt;")</code> creation, <code>.appendTo</code>, <code>.filter/.odd</code>, <code>.one</code>, <code>.hover</code>, and <code>.off(".ns")</code> namespace teardown — the muscle-memory API, reactive underneath.</p>
+      <pre class="snip">$(<span class="s">"&lt;li&gt;chip&lt;/li&gt;"</span>).appendTo(<span class="s">"#parityList"</span>);
+$(<span class="s">"#parityList li"</span>).odd().addClass(<span class="s">"hot"</span>);
+$(document).on(<span class="s">"click.demo"</span>, <span class="s">"#parityList li"</span>, fn);  $(document).off(<span class="s">".demo"</span>);</pre>
+      <div class="row">
+        <button id="chipAdd">$("&lt;li&gt;").appendTo</button>
+        <button id="chipOdd">.odd().addClass("hot")</button>
+        <button id="chipNs">delegate click.demo</button>
+        <button id="chipOffNs">off(".demo")</button>
+        <button id="chipOnce">.one("click") me</button>
+        <span class="out" id="parityOut"></span>
+      </div>
+      <ul id="parityList"></ul>
+    </section>
+
+    <!-- 6. Snippet libraries -->
+    <section>
+      <h2><span class="n">6</span> Snippet libraries — <code>$(selector, context)</code></h2>
+      <p class="hint">The second argument of <code>$</code> is <em>where to select</em>: an HTML string parses into an inert <code>&lt;template&gt;</code> and selections come back as <strong>clones</strong> — so one file holds many snippets, loaded once (the <code>@</code>-loader caches), stamped forever. An FX <em>node</em> as the second argument still means two-way bind.</p>
+      <pre class="snip">const snippets = $$(<span class="s">"@/snippets.html"</span>);              <span class="c">// one sync load, cached</span>
+$(<span class="s">"#user-card"</span>, snippets).removeAttr(<span class="s">"id"</span>).appendTo(<span class="s">"#snipHost"</span>);
+$(<span class="s">"section"</span>, $(<span class="s">"#outer"</span>, snippets));                <span class="c">// select inside a stamp</span></pre>
+      <div class="row">
+        <button id="snipUser">stamp #user-card</button>
+        <button id="snipAlert">stamp #alert-card</button>
+        <input id="snipName" type="text" placeholder="snip.user (reactive in stamps)" />
+        <span class="out" id="snipOut"></span>
+      </div>
+      <div id="snipHost" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem"></div>
+    </section>
+
+    <!-- 7. fxc components -->
+    <section>
+      <h2><span class="n">7</span> Components on the graph — <code>fxc</code></h2>
+      <p class="hint">Real web components declared in plain HTML (<code>components.html</code>), with lifecycle hooks (<code>mount/unmount/propChange</code>), light-DOM slots, <code>this:</code>-scoped styles without shadow DOM — and <strong>props that ARE graph sub-nodes</strong>: <code>$$("fxc.badge.hero.label").set("v2")</code> updates every stamp.</p>
+      <pre class="snip">$fxc.load(<span class="s">"/components.html"</span>);                <span class="c">// sync, cached — registers &lt;fxc-badge&gt;, &lt;fxc-stat&gt;</span>
+$(<span class="s">'&lt;fxc-badge $label="beta" $node="badge.hero"&gt;'</span>).appendTo(<span class="s">"#cmpHost"</span>);
+$$(<span class="s">"fxc.badge.hero.label"</span>).set(<span class="s">"v2"</span>);          <span class="c">// prop = sub-node → DOM updates</span></pre>
+      <div class="row">
+        <button id="cmpLoad">load + stamp components</button>
+        <input id="cmpLabel" type="text" placeholder="badge label (live prop)" />
+        <span class="out" id="cmpOut"></span>
+      </div>
+      <div id="cmpHost" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.6rem"></div>
+    </section>
+
+    <!-- 8. $.fn plugins -->
+    <section>
+      <h2><span class="n">8</span> Your old plugins still work — <code>$.fn</code> bridge</h2>
+      <p class="hint">Classic jQuery plugin authoring registers on every handle and group, and can use the reactive methods inside.</p>
+      <pre class="snip">$.fn.flash = function (color) {
+  return this.animate({ backgroundColor: color }, 150).animate({ backgroundColor: "" }, 300);
+};
+$(<span class="s">".card"</span>).flash(<span class="s">"#f59e0b"</span>);</pre>
+      <div class="row">
+        <button id="fnDemo">register + run $.fn.flash on the todo rows</button>
+        <span class="out" id="fnOut"></span>
+      </div>
+    </section>
+  </div>
+
+  <div id="log"></div>
+  <script type="module" src="./app-plus.js"></script>
+</body>
+</html>

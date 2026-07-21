@@ -1,0 +1,34 @@
+<!-- components.html — an fxc component LIBRARY. Register with:
+       $fxc.load("/components.html");
+     Then use anywhere:
+       <fxc-badge $label="beta" $node="badge.hero"><span>extra</span></fxc-badge>
+     Props live on the graph: $$("fxc.badge.hero.label").set("v2") -->
+
+<fxc:badge title="${prop:label|new}">
+  <b class="badge-label">${prop:label|new}</b>
+  <slot></slot>
+  <style>
+    this { display: inline-flex; gap: .45rem; align-items: center;
+           border: 1px solid #2dd4bf; border-radius: 999px; padding: .2rem .75rem; }
+    this:.badge-label { color: #2dd4bf; font-family: ui-monospace, monospace; }
+  </style>
+  <script>
+    export default class extends fxc {
+      label = "new";
+      mount() { this.el.dataset.mounted = "true"; }
+      propChange(name, value) { this.el.dataset.lastChange = name + "=" + value; }
+    }
+  </script>
+</fxc:badge>
+
+<fxc:stat>
+  <div class="stat-label"><slot name="label">metric</slot></div>
+  <div class="stat-value">${prop:value|0}</div>
+  <style>
+    this { display: inline-block; border: 1px solid #1f2b28; border-radius: 10px;
+           padding: .5rem .9rem; background: #0d1614; }
+    this:.stat-label { color: #8aa39c; font-size: .75rem; }
+    this:.stat-value { color: #34d399; font-size: 1.3rem; font-weight: 800;
+                       font-family: ui-monospace, monospace; }
+  </style>
+</fxc:stat>

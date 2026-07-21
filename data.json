@@ -1,0 +1,21 @@
+{
+  "title": "FX Mini team",
+  "people": [
+    {
+      "name": "Ada",
+      "role": "reactive core"
+    },
+    {
+      "name": "Grace",
+      "role": "sync loader"
+    },
+    {
+      "name": "Linus",
+      "role": "dom-dollar"
+    },
+    {
+      "name": "Margaret",
+      "role": "docs"
+    }
+  ]
+}

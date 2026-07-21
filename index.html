@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FX Mini — Playground</title>
+  <style>
+    :root {
+      --bg: #0b0f0e; --panel: #121a18; --panel-2: #0e1614; --line: #1f2b28;
+      --ink: #dfe7e4; --muted: #8aa39c; --accent: #2dd4bf; --accent-2: #34d399;
+      --warn: #f59e0b; --bad: #f87171;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, #10201c 0%, var(--bg) 55%);
+      color: var(--ink); line-height: 1.5; padding: 2rem 1.25rem 6rem;
+    }
+    .wrap { max-width: 940px; margin: 0 auto; }
+    header { margin-bottom: 2rem; }
+    .logo {
+      font-size: 2.6rem; font-weight: 900; letter-spacing: -0.04em;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .tag { color: var(--muted); font-size: 0.95rem; }
+    code { font-family: var(--mono); color: var(--accent); font-size: 0.9em; }
+    section {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.35rem; margin-top: 1.1rem;
+    }
+    h2 { font-size: 1.05rem; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.5rem; }
+    h2 .n { font-family: var(--mono); font-size: 0.72rem; color: var(--bg); background: var(--accent); border-radius: 6px; padding: 0.1rem 0.45rem; font-weight: 700; }
+    .hint { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.9rem; }
+    pre.snip {
+      background: #08110f; border: 1px solid var(--line); border-radius: 9px;
+      padding: 0.6rem 0.8rem; margin: 0 0 0.8rem; overflow-x: auto;
+      font-family: var(--mono); font-size: 0.8rem; color: #b7ccc6; line-height: 1.5;
+    }
+    pre.snip .c { color: #5b736c; }
+    pre.snip .s { color: var(--accent-2); }
+    .row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    button {
+      font: inherit; font-weight: 600; cursor: pointer; background: #16211e; color: var(--ink);
+      border: 1px solid var(--line); border-radius: 9px; padding: 0.5rem 0.9rem; transition: border-color .15s, transform .05s;
+    }
+    button:hover { border-color: var(--accent); }
+    button:active { transform: translateY(1px); }
+    input[type=text] { font: inherit; background: #0c1412; color: var(--ink); border: 1px solid var(--line); border-radius: 9px; padding: 0.5rem 0.7rem; min-width: 160px; }
+    input:focus { outline: none; border-color: var(--accent); }
+    .big { font-size: 1.8rem; font-weight: 800; font-family: var(--mono); color: var(--accent); }
+    .out { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-2); min-height: 1.2em; }
+    .pill { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.6rem; margin-top: 0.5rem; }
+    .card { background: #0d1614; border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem; font-size: 0.9rem; }
+    .card b { color: var(--accent-2); }
+    .frag { border: 1px dashed var(--line); border-radius: 10px; padding: 0.9rem; margin-top: 0.4rem; }
+    #log { position: fixed; right: 0; bottom: 0; left: 0; max-height: 32vh; overflow: auto; background: #06100e; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 0.78rem; color: #9fb7b0; padding: 0.6rem 1rem; }
+    #log .ok { color: var(--accent-2); } #log .err { color: var(--bad); } #log .k { color: var(--accent); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">FX&nbsp;Mini</div>
+      <p class="tag">Reactive node graph + synchronous <code>@</code>-module loading + a reactive <code>$</code>. One file, no build step. Open <code>app.js</code> to see every call below. <strong>New:</strong> see <a href="./plus.html">plus.html</a> for the FX Mini Plus playground.</p>
+    </header>
+
+    <!-- 1. Reactive foundation -->
+    <section>
+      <h2><span class="n">1</span> Reactive graph &amp; <code>$</code></h2>
+      <p class="hint">The DOM is bound to <code>$$("app.count")</code> — changing the node updates every binding. <code>$(".card")</code> is a group.</p>
+      <div class="row">
+        <span class="big" id="count">0</span>
+        <button id="inc">+1</button>
+        <button id="reset">reset</button>
+        <button id="paint">paint cards ($)</button>
+      </div>
+      <div class="cards" id="cardbox">
+        <div class="card">card <b>A</b></div><div class="card">card <b>B</b></div>
+        <div class="card">card <b>C</b></div><div class="card">card <b>D</b></div>
+      </div>
+    </section>
+
+    <!-- 2. Load module as global -->
+    <section>
+      <h2><span class="n">2</span> Load a module as a global — <code>.options({ global })</code></h2>
+      <p class="hint">The <code>@</code>-prefix loads the file synchronously; <code>.options({ global })</code> invokes the plugin factory and publishes its API on the global name.</p>
+      <pre class="snip"><span class="c">// plugins/greeter.js default-exports (fx,opts) =&gt; api</span>
+$$(<span class="s">"@/plugins/greeter.js"</span>).options({ global: <span class="s">"$greeter"</span> });
+$greeter.hello(<span class="s">"FX"</span>);</pre>
+      <div class="row"><button id="loadPlugin">run it</button><span class="out" id="pluginOut"></span></div>
+    </section>
+
+    <!-- 3. Mount module on a node -->
+    <section>
+      <h2><span class="n">3</span> Mount a module onto a node — <code>node.path@/file</code></h2>
+      <p class="hint">Prefix the spec with a node path to graft the module's namespace onto that node <em>and</em> expose a global.</p>
+      <pre class="snip">$$(<span class="s">"app.tools@/plugins/greeter.js"</span>).options({ global: <span class="s">"$tools"</span> });
+<span class="c">// now both $tools and the node app.tools carry the module</span></pre>
+      <div class="row"><button id="mountMod">run it</button><span class="out" id="mountOut"></span></div>
+    </section>
+
+    <!-- 4. Class graft .as() -->
+    <section>
+      <h2><span class="n">4</span> Class graft — <code>.as(Client)</code></h2>
+      <p class="hint">Load a class module, then <code>.as(Ctor)</code> grafts it onto the node: sets the node <em>type</em>, registers its methods, and maps every instance field to a <strong>reactive sub-node</strong> with two-way sync. Edit the fields — <code>fullname()</code> recomputes live.</p>
+      <pre class="snip"><span class="c">// models/Client.js default-exports class Client { fullname() {…} }</span>
+const Client = $$(<span class="s">"@/models/Client.js"</span>).ns.default;
+const client = $$(<span class="s">"app.client"</span>).as(Client);   <span class="c">// first/last → reactive sub-nodes</span>
+$$(<span class="s">"app.client.first"</span>).set(<span class="s">"Grace"</span>);       <span class="c">// client.fullname() updates</span></pre>
+      <div class="row"><button id="graft">graft Client</button><span class="pill" id="graftInfo"></span></div>
+      <div class="row" id="clientFields" style="margin-top:.6rem;display:none">
+        <input id="first" type="text" placeholder="first" />
+        <input id="last" type="text" placeholder="last" />
+        <span class="pill">fullname →</span>
+        <span class="big" id="fullname" style="font-size:1.3rem">—</span>
+      </div>
+    </section>
+
+    <!-- 5. Sync text + module -->
+    <section>
+      <h2><span class="n">5</span> Synchronous text &amp; module — <code>$$("@./file")</code></h2>
+      <p class="hint"><code>.html/.md/.css</code> come back as text; <code>.js/.ts</code> as a module. (JSON: <code>JSON.parse(fx.moduleLoader.loadSync(path))</code>.)</p>
+      <div class="row">
+        <button id="loadHtml">load @./partial.html</button>
+        <button id="loadPage">$("#host").html($$("@/page.html"))</button>
+        <button id="loadMod">load @./greet.js</button>
+        <span class="out" id="modout"></span>
+      </div>
+      <div class="frag" id="frag"><span class="pill">nothing loaded yet</span></div>
+      <div id="host" style="margin-top:.6rem"></div>
+    </section>
+
+    <!-- 6. Two-way bind shorthand -->
+    <section>
+      <h2><span class="n">6</span> Two-way bind shorthand — <code>$("#el", $$(node))</code></h2>
+      <p class="hint">Pass an FX node as the second argument to <code>$()</code> and the element binds <strong>both ways</strong>: edits flow into the node, and <code>$$(node).val(v)</code> flows back to the element.</p>
+      <pre class="snip">$(<span class="s">"#field"</span>, $$(<span class="s">"bind.demo"</span>));   <span class="c">// two-way in one line</span>
+$$(<span class="s">"bind.demo"</span>).val(<span class="s">"set from code"</span>); <span class="c">// updates the input</span></pre>
+      <div class="row">
+        <input id="field" type="text" placeholder="type here…" />
+        <span class="pill">$$("bind.demo") →</span>
+        <span class="out" id="bindMirror"></span>
+      </div>
+      <div class="row" style="margin-top:.5rem"><button id="setFromCode">$$("bind.demo").val("set from code")</button></div>
+    </section>
+
+    <!-- 7. Node links -->
+    <section>
+      <h2><span class="n">7</span> Node links — grafted methods through a link</h2>
+      <p class="hint">Pass a node as a <em>value</em> to link one node to another. Grafted methods resolve <strong>through</strong> the link, and it stays live.</p>
+      <pre class="snip">$$(<span class="s">"app.client"</span>).as(Client);              <span class="c">// graft (panel 4)</span>
+$$(<span class="s">"app.mirror"</span>, $$(<span class="s">"app.client"</span>));      <span class="c">// LINK mirror → client</span>
+$$(<span class="s">"app.mirror"</span>).fullname();            <span class="c">// method through the link</span>
+$$(<span class="s">"app.mirror.fullname"</span>)();           <span class="c">// …or via the sub-path</span></pre>
+      <div class="row"><button id="linkBtn">link + call</button><span class="out" id="linkOut"></span></div>
+    </section>
+
+    <!-- 8. Declarative templating (auto-hydrated) -->
+    <section>
+      <h2><span class="n">8</span> Declarative templating <span class="pill">auto-hydrated</span></h2>
+      <p class="hint">Everything below is <strong>straight in index.html</strong> — no JS wires it. On load, fx-mini hydrates <code>$${…}</code> interpolation (with <code>|</code> defaults &amp; nesting) and <code>&lt;import&gt;</code>. Type in the box — the interpolations update reactively.</p>
+      <import src="./models/Client.js" global="$who" />
+      <div class="frag">
+        <div>greeting: <b>$${"tpl.name" | "Anonymous"}</b></div>
+        <div>nested default: <b>$${"tpl.name" | $${"tpl.alt" | "(fallback)"}}</b></div>
+        <div>from &lt;import global="$who"&gt;: <b>{$who.first} {$who.last}</b></div>
+      </div>
+      <div class="row" style="margin-top:.6rem"><input id="tplName" type="text" placeholder="type to set tpl.name…" /></div>
+    </section>
+  </div>
+
+  <div id="log"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
